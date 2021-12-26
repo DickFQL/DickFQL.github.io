@@ -2440,7 +2440,7 @@ color
   position: relative;
   float: right;
   margin-top: -10px;
-  color: #555;
+  color: #fff;
   background: none;
   text-align: right;
   width: auto;
@@ -3027,7 +3027,7 @@ a.gitment-editor-footer-tip:hover {
   color: #c8c8c8;
 }
 .article-title {
-  color: #999;
+  color: #fff;
   margin-left: 0px;
   font-weight: initial;
   line-height: 35px;
@@ -3043,7 +3043,7 @@ a.gitment-editor-footer-tip:hover {
   transition: color 0.3s;
 }
 .article-title:hover {
-  color: #fff;
+  color: #999;
 }
 #more {
   display: none;
@@ -3604,7 +3604,7 @@ a.gitment-editor-footer-tip:hover {
   position: relative;
   float: right;
   margin-top: -10px;
-  color: #555;
+  color: #fff;
   background: none;
   text-align: right;
   width: auto;
