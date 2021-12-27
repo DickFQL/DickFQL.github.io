@@ -315,7 +315,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2021-11-17 23:17:12" itemprop="dateModified" datetime="2021-11-17T23:17:12+08:00">2021-11-17</time>
+      <time title="修改时间：2021-12-27 11:02:11" itemprop="dateModified" datetime="2021-12-27T11:02:11+08:00">2021-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -338,17 +338,15 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>简单的代码审计，MD5的变式。</p>
-<h1 id="MD5经典等式"><a href="#MD5经典等式" class="headerlink" title="MD5经典等式"></a>MD5经典等式</h1><h2 id="a-md5-a"><a href="#a-md5-a" class="headerlink" title="$a==md5($a)"></a>$a==md5($a)</h2><p>a=0e215962017 的 MD5 值也是由 0e 开头，在 PHP 弱类型比较中相等</p>
-<h2 id="a-b，md5-a-md5-b"><a href="#a-b，md5-a-md5-b" class="headerlink" title="$a!=$b，md5(a)==md5(b)"></a>$a!=$b，md5(a)==md5(b)</h2><p>两个不同的字符串，MD5加密后相等。<br>PHP会把每一个以”0E”开头的哈希值都解释为0，所以选择加密后为0E开头的字符串就行。<br>QNKCDZO，s155964671a，s214587387a,s878926199a,这些字符串的哈希值都是为’0E’开头。</p>
-<h2 id="a-b，md5-a-md5-b-1"><a href="#a-b，md5-a-md5-b-1" class="headerlink" title="$a!==$b，md5(a)===md5(b)"></a>$a!==$b，md5(a)===md5(b)</h2><p>绝对相等和绝对不等，这种情况要求就高了。<br>“===”：等式两边，类型一致，值一致，否则就为假。”!==”：等式两边，类型或值不一致就为真，否则就为假。<br>绕过方式1：<br>md5()不能处理数组，传数组就为null，所以传数组，a[]=1,b[]=2就能绕过了<br>注：pre_match函数函数也无法处理数组</p>
-<h2 id="MD5截断"><a href="#MD5截断" class="headerlink" title="MD5截断"></a>MD5截断</h2><p>substr(md5($a),5,5)=”xxxxx”<br>输入明文，MD5加密后的值截取一部分字符串的值等于指定字符串的值<br>针对每个数字进行MD5加密，截取部分字符串进行比对。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import hashlib</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(1,1000001):</span><br><span class="line">    m = hashlib.md5()</span><br><span class="line">    m.update(str(i).encode())</span><br><span class="line">    <span class="keyword">if</span> m.hexdigest()[5:10] == <span class="string">&quot;aceaa&quot;</span>:</span><br><span class="line">        <span class="built_in">print</span>(i)</span><br><span class="line">        <span class="built_in">break</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="SELECT-FROM-admin-WHERE-username-‘admin’-and-password-md5-password-true"><a href="#SELECT-FROM-admin-WHERE-username-‘admin’-and-password-md5-password-true" class="headerlink" title="SELECT * FROM admin WHERE username = ‘admin’ and password = md5($password,true). "></a>SELECT * FROM admin WHERE username = ‘admin’ and password = md5($password,true). </h2><p>16位原始二进制格式的字符串===16位ascii对应字符的字符串。<br>也就是使得md5($password,true)之后的值为’or’1xxx<br>即：SELECT * FROM admin WHERE username = ‘admin’ and password =’’or’1xxxxx’<br>因为在mysql里面，在用作布尔型判断时，以1开头的字符串会被当做整型数。</p>
-<p>当$password=ffifdyop时，md5($password,true)=‘or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c<br>语句为：<br>SELECT * FROM admin WHERE username = ‘admin’ and password =’ ‘or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c ’</p>
-<p>另外：<br>…… password =‘’ or x(非零数),也能成功绕过<br>由反斜杠’&#39;和字母x(或X)及随后的1～2个十六进制数字构成的字符序列。例如，’\x30’、’\x41’、’\X61’分别表示字符’0’、’A’和’a’。因为字符’0’、’A’和’a’的ASCII码的十六进制值分别为0x30、0x41和0x61。</p>
-<p>​</p>
-<link rel="stylesheet" href="/css/spoiler.css" type="text/css"><script src="/js/spoiler.js" type="text/javascript" async></script>
+<p>MD5经典等式</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/23/HECTF/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
