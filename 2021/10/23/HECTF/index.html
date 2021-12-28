@@ -18,20 +18,22 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/yellow/pace-theme-flat-top.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"dickfql.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="简单的代码审计，MD5的变式。 MD5经典等式">
+<meta name="description" content="MD5经典等式，弱类型比较大杂烩。目前有$a&#x3D;&#x3D;md5($a)、$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)、$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)、MD5截断、md5($password,true)。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HECTF">
+<meta property="og:title" content="PHP之MD5变式">
 <meta property="og:url" content="https://dickfql.github.io/2021/10/23/HECTF/index.html">
 <meta property="og:site_name" content="小付的新♂日♂暮♂里">
-<meta property="og:description" content="简单的代码审计，MD5的变式。 MD5经典等式">
+<meta property="og:description" content="MD5经典等式，弱类型比较大杂烩。目前有$a&#x3D;&#x3D;md5($a)、$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)、$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)、MD5截断、md5($password,true)。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-23T02:30:06.000Z">
-<meta property="article:modified_time" content="2021-12-27T03:02:11.017Z">
+<meta property="article:modified_time" content="2021-12-27T13:32:09.349Z">
 <meta property="article:author" content="Fantasy Fu">
 <meta property="article:tag" content="代码审计">
-<meta property="article:tag" content="Md5">
+<meta property="article:tag" content="MD5">
 <meta name="twitter:card" content="summary">
 
 
@@ -39,10 +41,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dickfql.github.io/2021/10/23/HECTF/","path":"2021/10/23/HECTF/","title":"HECTF"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dickfql.github.io/2021/10/23/HECTF/","path":"2021/10/23/HECTF/","title":"PHP之MD5变式"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HECTF | 小付的新♂日♂暮♂里</title>
+<title>PHP之MD5变式 | 小付的新♂日♂暮♂里</title>
   
 
 
@@ -123,14 +125,14 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#a-md5-a"><span class="nav-number">1.</span> <span class="nav-text">$a&#x3D;&#x3D;md5($a)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-b%EF%BC%8Cmd5-a-md5-b"><span class="nav-number">2.</span> <span class="nav-text">$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MD5%E6%88%AA%E6%96%AD"><span class="nav-number">3.</span> <span class="nav-text">MD5截断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT-FROM-admin-WHERE-username-%E2%80%98admin%E2%80%99-and-password-md5-password-true"><span class="nav-number">4.</span> <span class="nav-text">SELECT * FROM admin WHERE username &#x3D; ‘admin’ and password &#x3D; md5($password,true). </span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#a-md5-a"><span class="nav-number">1.</span> <span class="nav-text">$a&#x3D;&#x3D;md5($a)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-b%EF%BC%8Cmd5-a-md5-b"><span class="nav-number">2.</span> <span class="nav-text">$a!&#x3D;$b，md5(a)&#x3D;&#x3D;md5(b)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-b%EF%BC%8Cmd5-a-md5-b-1"><span class="nav-number">3.</span> <span class="nav-text">$a!&#x3D;&#x3D;$b，md5(a)&#x3D;&#x3D;&#x3D;md5(b)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MD5%E6%88%AA%E6%96%AD"><span class="nav-number">4.</span> <span class="nav-text">MD5截断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#md5-password-true"><span class="nav-number">5.</span> <span class="nav-text">md5($password,true). </span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Fantasy Fu"
-      src="/images/1.png">
+      src="/images/banana.jpg">
   <p class="site-author-name" itemprop="name">Fantasy Fu</p>
   <div class="site-description" itemprop="description">振兴哲学</div>
 </div>
@@ -144,7 +146,7 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -154,6 +156,11 @@
       </div>
   </nav>
 </div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dickfql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dickfql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
 
 
 
@@ -191,7 +198,7 @@
     <link itemprop="mainEntityOfPage" href="https://dickfql.github.io/2021/10/23/HECTF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/1.png">
+      <meta itemprop="image" content="/images/banana.jpg">
       <meta itemprop="name" content="Fantasy Fu">
       <meta itemprop="description" content="振兴哲学">
     </span>
@@ -201,7 +208,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HECTF
+          PHP之MD5变式
         </h1>
 
         <div class="post-meta-container">
@@ -219,7 +226,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2021-12-27 11:02:11" itemprop="dateModified" datetime="2021-12-27T11:02:11+08:00">2021-12-27</time>
+      <time title="修改时间：2021-12-27 21:32:09" itemprop="dateModified" datetime="2021-12-27T21:32:09+08:00">2021-12-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -229,9 +236,28 @@
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
           <a href="/categories/web/" itemprop="url" rel="index"><span itemprop="name">web</span></a>
         </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/web/php/" itemprop="url" rel="index"><span itemprop="name">php</span></a>
+        </span>
     </span>
 
   
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
 </div>
 
         </div>
@@ -241,22 +267,18 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>简单的代码审计，MD5的变式。</p>
-<p>MD5经典等式</p>
+        <p>MD5经典等式，弱类型比较大杂烩。<br>目前有$a==md5($a)、$a!=$b，md5(a)==md5(b)、$a!=$b，md5(a)==md5(b)、MD5截断、md5($password,true)。</p>
 <span id="more"></span>
-<p>====================</p>
+
 <h2 id="a-md5-a"><a href="#a-md5-a" class="headerlink" title="$a==md5($a)"></a>$a==md5($a)</h2><p>a=0e215962017 的 MD5 值也是由 0e 开头，在 PHP 弱类型比较中相等</p>
 <h2 id="a-b，md5-a-md5-b"><a href="#a-b，md5-a-md5-b" class="headerlink" title="$a!=$b，md5(a)==md5(b)"></a>$a!=$b，md5(a)==md5(b)</h2><p>两个不同的字符串，MD5加密后相等。<br>PHP会把每一个以”0E”开头的哈希值都解释为0，所以选择加密后为0E开头的字符串就行。<br>QNKCDZO，s155964671a，s214587387a,s878926199a,这些字符串的哈希值都是为’0E’开头。</p>
-<p>$a!==$b，md5(a)===md5(b)</p>
-<hr>
-<p>绝对相等和绝对不等，这种情况要求就高了。<br>“===”：等式两边，类型一致，值一致，否则就为假。”!==”：等式两边，类型或值不一致就为真，否则就为假。<br>绕过方式1：<br>md5()不能处理数组，传数组就为null，所以传数组，a[]=1,b[]=2就能绕过了<br>注：pre_match函数函数也无法处理数组</p>
-<h2 id="MD5截断"><a href="#MD5截断" class="headerlink" title="MD5截断"></a>MD5截断</h2><p>substr(md5($a),5,5)=”xxxxx”<br>输入明文，MD5加密后的值截取一部分字符串的值等于指定字符串的值<br>针对每个数字进行MD5加密，截取部分字符串进行比对。</p>
+<h2 id="a-b，md5-a-md5-b-1"><a href="#a-b，md5-a-md5-b-1" class="headerlink" title="$a!==$b，md5(a)===md5(b)"></a>$a!==$b，md5(a)===md5(b)</h2><p>绝对相等和绝对不等，这种情况要求就高了。<br>“===”：等式两边，类型一致，值一致，否则就为假。”!==”：等式两边，类型或值不一致就为真，否则就为假。<br>绕过方式1：<br>md5()不能处理数组，传数组就为null，所以传数组，a[]=1,b[]=2就能绕过了<br>注：md5()函数，pre_match()函数,strcmp()函数都无法处理数组</p>
+<h2 id="MD5截断"><a href="#MD5截断" class="headerlink" title="MD5截断"></a>MD5截断</h2><p>substr(md5($a),5,5)=”xxxxx”<br>输入明文，MD5加密后的值截取一部分字符串的值等于指定字符串的值。<br>针对每个数字进行MD5加密，截取部分字符串进行比对。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import hashlib</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(1,1000001):</span><br><span class="line">    m = hashlib.md5()</span><br><span class="line">    m.update(str(i).encode())</span><br><span class="line">    <span class="keyword">if</span> m.hexdigest()[5:10] == <span class="string">&quot;aceaa&quot;</span>:</span><br><span class="line">        <span class="built_in">print</span>(i)</span><br><span class="line">        <span class="built_in">break</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="SELECT-FROM-admin-WHERE-username-‘admin’-and-password-md5-password-true"><a href="#SELECT-FROM-admin-WHERE-username-‘admin’-and-password-md5-password-true" class="headerlink" title="SELECT * FROM admin WHERE username = ‘admin’ and password = md5($password,true). "></a>SELECT * FROM admin WHERE username = ‘admin’ and password = md5($password,true). </h2><p>16位原始二进制格式的字符串===16位ascii对应字符的字符串。<br>也就是使得md5($password,true)之后的值为’or’1xxx<br>即：SELECT * FROM admin WHERE username = ‘admin’ and password =’’or’1xxxxx’<br>因为在mysql里面，在用作布尔型判断时，以1开头的字符串会被当做整型数。</p>
-<p>当$password=ffifdyop时，md5($password,true)=‘or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c<br>语句为：<br>SELECT * FROM admin WHERE username = ‘admin’ and password =’ ‘or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c ’</p>
-<p>另外：<br>…… password =‘’ or x(非零数),也能成功绕过<br>由反斜杠’&#39;和字母x(或X)及随后的1～2个十六进制数字构成的字符序列。例如，’\x30’、’\x41’、’\X61’分别表示字符’0’、’A’和’a’。因为字符’0’、’A’和’a’的ASCII码的十六进制值分别为0x30、0x41和0x61。</p>
-<p>​</p>
+<h2 id="md5-password-true"><a href="#md5-password-true" class="headerlink" title="md5($password,true). "></a>md5($password,true). </h2><p>SELECT * FROM admin WHERE username = ‘admin’ AND password = md5($password,true).<br>16位原始二进制格式的字符串===16位ascii对应字符的字符串。<br>也就是使得md5($password,true)之后的值为’or’1xxx<br>即：SELECT * FROM admin WHERE username = ‘admin’ and password =’’or’1xxxxx’<br>因为在mysql里面，在用作布尔型判断时，以1开头的字符串会被当做整型数。</p>
+<p>当$password=ffifdyop时，md5($password,true)=‘or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c<br>语句为：<br>SELECT * FROM admin WHERE username = ‘admin’ and password =’’or’6\xc9]\x99\xe9!r,\xf9\xedb\x1c’</p>
+<p>另外：<br>…… password =’’ or x(非零数),也能成功绕过<br>由反斜杠’&#39;和字母x(或X)及随后的1～2个十六进制数字构成的字符序列。<br>例如’\x30’、’\x41’、’\X61’分别表示字符’0’、’A’和’a’。因为字符’0’、’A’和’a’的ASCII码的十六进制值分别为0x30、0x41和0x61。</p>
 <link rel="stylesheet" href="/css/spoiler.css" type="text/css"><script src="/js/spoiler.js" type="text/javascript" async></script>
     </div>
 
@@ -265,9 +287,26 @@
     
 
     <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Fantasy Fu
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://dickfql.github.io/2021/10/23/HECTF/" title="PHP之MD5变式">https://dickfql.github.io/2021/10/23/HECTF/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
           <div class="post-tags">
               <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" rel="tag"># 代码审计</a>
-              <a href="/tags/Md5/" rel="tag"># Md5</a>
+              <a href="/tags/MD5/" rel="tag"># MD5</a>
           </div>
 
         
@@ -308,6 +347,20 @@
   </span>
   <span class="author" itemprop="copyrightHolder">Fantasy Fu</span>
 </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">3k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2 分钟</span>
+  </span>
+</div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
 
@@ -323,6 +376,7 @@
 
 
 
+  <script src="/js/third-party/pace.js"></script>
 
   
 

@@ -2144,6 +2144,13 @@ pre code {
 .post-block:last-of-type .post-eof {
   display: none;
 }
+.post-copyright ul {
+  list-style: none;
+  padding: 0.5em 1em;
+  background: var(--card-bg-color);
+  border-left: 3px solid #ff2a2a;
+  margin: 1em 0 0;
+}
 .post-tags {
   margin-top: 40px;
   text-align: center;
@@ -2776,19 +2783,23 @@ ul.breadcrumb li:last-child {
   }
 }
 .main-inner {
-  opacity: 0.8;
-}
-.sidebar {
-  background-color: transparent;
   opacity: 0.7;
 }
-​,
+.sidebar {
+  opacity: 0.7;
+}
 .header-inner {
   background: rgba(255,255,255,0.7);
-  z-index: 10;
+}
+.post {
+  margin-top: 60px;
+  padding: 20px;
+  margin-bottom: 60px;
+  -webkit-box-shadow: 0 0 5px #788072;
+  -moz-box-shadow: 0 0 5px rgba(202,203,204,0.5);
 }
 body {
-  background-image: url("/images/background2.png");
+  background-image: url("/images/bg1.png");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
