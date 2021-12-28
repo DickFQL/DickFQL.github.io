@@ -2825,7 +2825,16 @@ ul.breadcrumb li:last-child {
     padding: 10px 12px;
   }
 }
+body {
+  background-image: url("/images/bg1.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: 50% 50%;
+}
 .main-inner {
+  margin-top: 10px;
+  padding: 60px 60px 60px 60px;
   opacity: 0.7;
 }
 .sidebar {
@@ -2840,12 +2849,4 @@ ul.breadcrumb li:last-child {
   margin-bottom: 60px;
   -webkit-box-shadow: 0 0 5px #788072;
   -moz-box-shadow: 0 0 5px rgba(202,203,204,0.5);
-}
-body {
-  background-image: url("/images/bg1.png");
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: 50% 50%;
-  z-index: -10;
 }
